@@ -5,8 +5,16 @@ const catchMonErr = require("../middleware/catchMongooseErr");
 // create products api - api/product/new
 
 exports.createProduct = catchMonErr(async (req, res, next) => {
-  const product = await Product.create(req.body);
+  let images = [];
 
+  if (req.files.length > 0) {
+    req.files.forEach((file) => {
+      let url = `${process.env.BACKEND_URL}/uploads/products/${file.originalname}`;
+      images.push({ image: url });
+    });
+  }
+  req.body.images = images;
+  const product = await Product.create(req.body);
   res.status(202).json({
     success: true,
     product,
@@ -73,4 +81,3 @@ exports.deleteProduct = catchMonErr(async (req, res, next) => {
     message: "product deleted",
   });
 });
- 

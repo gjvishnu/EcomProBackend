@@ -1,5 +1,19 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer")
+const path = require('path')
+
+const upload = multer({
+  storage : multer.diskStorage({
+    destination : function (req,file,cb){
+      cb(null , path.join(__dirname,"..","uploads/users"))
+    },
+    filename : function (req,file,cb){
+      cb(null , file.originalname)
+    }
+  })
+})
+
 const {
   registerUser,
   loginUser,
@@ -17,12 +31,12 @@ const {
   isAuthenticatedRole,
 } = require("../middleware/authentication");
 
-router.post("/user/new", registerUser);
+router.post("/user/new" ,upload.single("avatar"),registerUser);
 router.post("/login", loginUser);
 router.get("/logout", logoutUser);
 router.get("/user/profile", isAuthenticatedUser, myprofile);
 router.put("/user/changepassword", isAuthenticatedUser, changePassword);
-router.put("/user/edit", isAuthenticatedUser, editProfile);
+router.put("/user/edit",upload.single('avatar'), isAuthenticatedUser, editProfile);
 
 
 //admin routes

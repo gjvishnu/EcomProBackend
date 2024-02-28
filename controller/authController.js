@@ -5,7 +5,14 @@ const Errorhand = require("../utils/errorhand");
 
 // register user
 exports.registerUser = catchMonErr(async (req, res, next) => {
-  const { name, email, password, avatar } = req.body;
+
+ let avatar ;
+
+if(req.file){
+avatar = `${process.env.BACKEND_URL}/uploads/users/${req.file.originalname}`
+}
+
+  const { name, email, password } = req.body;
 
   const user = await User.create({ name, email, password, avatar });
 
@@ -111,8 +118,14 @@ exports.editProfile = catchMonErr(async (req, res, next) => {
   let newData = {
     name: req.body.name,
     emai: req.body.email,
-    avatar: req.body.avatar,
-  };
+   };
+   let avatar ;
+
+   if(req.file){
+   avatar = `${process.env.BACKEND_URL}/uploads/users/${req.file.originalname}`
+   newData = {...newData,avatar}
+   }
+
 
   const user = await User.findByIdAndUpdate(req.user.id, newData, {
     new: true,
